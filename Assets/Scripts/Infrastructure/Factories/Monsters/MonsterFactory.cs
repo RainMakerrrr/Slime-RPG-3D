@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Infrastructure.Services;
+using Infrastructure.Services.Assets;
+using Logic;
+using Logic.Health;
 using Logic.Monsters;
+using StaticData.Monsters;
 using UnityEngine;
 
 namespace Infrastructure.Factories.Monsters
@@ -9,29 +12,48 @@ namespace Infrastructure.Factories.Monsters
     public class MonsterFactory : IMonsterFactory
     {
         private readonly IAssetProvider _assetProvider;
+        private readonly ITransformable _player;
 
-        private Dictionary<MonsterType, Monster> _monsters;
+        private Dictionary<MonsterType, MonsterStaticData[]> _monsters = new();
+        private readonly IDamageable _damageable;
 
-        public MonsterFactory(IAssetProvider assetProvider)
+        public MonsterFactory(IAssetProvider assetProvider, ITransformable player, IDamageable damageable)
         {
             _assetProvider = assetProvider;
+            _player = player;
+            _damageable = damageable;
         }
+
 
         public void Load()
         {
-            _monsters = _assetProvider.LoadAll<Monster>(AssetPath.Monsters).ToDictionary(m => m.Type);
+            MonsterStaticData[] data = _assetProvider.LoadAll<MonsterStaticData>(AssetPath.Monsters);
+            _monsters.Add(MonsterType.Medium, data.Where(d => d.MonsterType == MonsterType.Medium).ToArray());
+            _monsters.Add(MonsterType.Boss, data.Where(d => d.MonsterType == MonsterType.Boss).ToArray());
         }
 
-        public Monster Create(MonsterType type)
+        public GameObject Create(MonsterType type)
         {
-            Monster monster = Object.Instantiate(_monsters[type]);
+            MonsterStaticData[] data = _monsters[type];
+            GameObject prefab = data[Random.Range(0, data.Length)].MonsterPrefab;
+            
+            GameObject monsterMovement = Object.Instantiate(prefab);
 
-            return monster;
+            return monsterMovement;
         }
 
-        public Monster Create(MonsterType type, Vector3 position, Transform parent)
+        public GameObject Create(MonsterType type, Vector3 position, Transform parent)
         {
-            Monster monster = Object.Instantiate(_monsters[type], position, Quaternion.identity, parent);
+            MonsterStaticData[] data = _monsters[type];
+            MonsterStaticData staticData = data[Random.Range(0, data.Length)];
+            
+            GameObject monsterPrefab = staticData.MonsterPrefab;
+            GameObject monster =
+                Object.Instantiate(monsterPrefab, position, monsterPrefab.transform.rotation, parent);
+
+            monster.GetComponent<MonsterAttack>().Construct(staticData.AttackSpeed, staticData.Damage, _damageable);
+            monster.GetComponent<MonsterMovement>().Construct(_player, staticData.MoveSpeed);
+            monster.GetComponent<MonsterHealth>().Construct(staticData.Health);
 
             return monster;
         }

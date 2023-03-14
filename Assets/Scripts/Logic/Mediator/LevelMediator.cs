@@ -2,15 +2,21 @@
 {
     public class LevelMediator : ILevelMediator
     {
-        private IMessageReceiver _player;
-        private IMessageReceiver _monsterSpawner;
+        private readonly IMessageReceiver _player;
+        private readonly IMessageReceiver _monsterSpawner;
 
-        public void Send(IMessageReceiver receiver)
+        public LevelMediator(IMessageReceiver player, IMessageReceiver monsterSpawner)
+        {
+            _player = player;
+            _monsterSpawner = monsterSpawner;
+        }
+
+        public void Send(IMessageReceiver receiver, int count = 0)
         {
             if (receiver == _player)
-                _monsterSpawner.Receive();
+                _monsterSpawner.Receive(count);
             else if (receiver == _monsterSpawner)
-                _monsterSpawner.Receive();
+                _player.Receive(count);
         }
     }
 }

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bfdd9546e284a94ac0767a074b2d6f4, type: 3}
+  m_Name: Cactus Statid Data
+  m_EditorClassIdentifier: 
+  _monsterType: 1
+  _moveSpeed: 1.1
+  _damage: 20
+  _health: 150
+  _attackSpeed: 1.25
+  _monsterPrefab: {fileID: 5743698398543532634, guid: 91f71936e409f0e4b975d9a39448ae3b, type: 3}

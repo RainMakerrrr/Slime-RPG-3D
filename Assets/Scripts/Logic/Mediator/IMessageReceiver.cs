@@ -2,6 +2,6 @@
 {
     public interface IMessageReceiver
     {
-        void Receive();
+        void Receive(int count = 0);
     }
 }

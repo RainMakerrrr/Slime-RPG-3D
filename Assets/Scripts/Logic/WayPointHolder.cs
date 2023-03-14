@@ -1,11 +1,14 @@
-﻿using Logic.Mediator;
+﻿using System;
+using Logic.Mediator;
 using UnityEngine;
 
 namespace Logic
 {
     public class WayPointHolder : MonoBehaviour
     {
-        [SerializeField] private Transform[] _points;
+        public event Action ReachAllPoints;
+        
+        [SerializeField] private Waypoint[] _points;
 
         private ILevelMediator _mediator;
 
@@ -14,11 +17,15 @@ namespace Logic
         private bool OutOfPoints => _index >= _points.Length;
 
 
-        public Vector3? GetCurrentWayPoint()
+        public Waypoint GetCurrentWayPoint()
         {
-            if (OutOfPoints) return null;
+            if (OutOfPoints)
+            {
+                ReachAllPoints?.Invoke();
+                return null;
+            }
 
-            Vector3 point = _points[_index].position;
+            Waypoint point = _points[_index];
             _index++;
 
             return point;
